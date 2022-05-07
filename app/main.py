@@ -4,6 +4,7 @@ import xlwings as xw
 import yfinance as yf
 from fastapi import Body
 from app import app
+import sys
 
 
 from crunchbase import get_data
@@ -12,6 +13,10 @@ from crunchbase import get_data
 def hello(data: dict = Body):
     # Instantiate a Book object with the deserialized request body
     book = xw.Book(json=data)
+
+    
+    """ sys.setrecursionlimit(2000)
+    print(sys.getrecursionlimit()) """
 
     if "Crunchbase" not in [sheet.name for sheet in book.sheets]:
         # Insert and prepare the sheet for first use

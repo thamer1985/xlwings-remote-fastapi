@@ -12,6 +12,10 @@ ENV PYTHONUNBUFFERED=1
 # Install pip requirements
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
+RUN python -m pip install beautifulsoup4
+RUN python -m pip install playwright
+RUN python -m playwright install
+RUN playwright install-deps
 
 WORKDIR /app
 COPY . /app

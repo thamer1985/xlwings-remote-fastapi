@@ -1,7 +1,7 @@
 import asyncio
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
-
+from time import sleep
 
 async def get_overview_html(mylink):
     async with async_playwright() as p:
@@ -52,12 +52,33 @@ async def get_data(mylink):
         'blob-formatter', class_="ng-star-inserted"    
         ).text
 
+
         #Get the website
         website=soup.find(
         'a', class_="component--field-formatter link-accent ng-star-inserted"    
         ).text
 
-        data=[name,html,adress,num_empoyees,stock_symbol,website]
+        #get the last price
+        await page.locator("text=Financials").click()
+        sleep(3)
+        data_html=await page.frame_locator("iframe.ng-star-inserted").locator("#mediumwidgetembed").inner_html()
+        soup=BeautifulSoup(data_html,'lxml')
+        pricespan = soup.find(
+        'span', title=" Last price ")
+        price=pricespan.text
+
+        #get the Monthly Visits from technology tab
+        await page.locator('a :has-text("Technology")').click()
+        data_html=await page.locator('a.link-primary:has-text("Visits")').first.inner_html()
+        soup=BeautifulSoup(data_html,'lxml')
+        visits_span = soup.find_all('span')
+        for sp in visits_span:
+            if sp.has_attr('title'):
+                monthly_visits=sp
+
+        #Create the Data colums
+        data=[name,html,adress,num_empoyees,stock_symbol,website,price,monthly_visits]
+
         await browser.close()
         return data    
 
